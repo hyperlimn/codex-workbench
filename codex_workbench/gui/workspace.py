@@ -8,9 +8,16 @@ from urllib.parse import urlparse
 import gi
 
 gi.require_version("Gtk", "4.0")
-from gi.repository import Gio, Gtk  # noqa: E402
+from gi.repository import Gio, GLib, Gtk  # noqa: E402
 
 from ..associated import resolve_project_path
+from ..codex_presentation import (
+    CodexRailState,
+    TranscriptExporter,
+    TranscriptSession,
+    apply_terminal_theme,
+    create_status_rail_widget,
+)
 from ..models import Project
 from ..terminal import (
     embedded_codex_environment,
@@ -165,16 +172,22 @@ def resolve_pane_path(
 
 
 class TerminalSurface(BaseSurface):
-    def __init__(self, session: VteTerminalSession, state: dict[str, Any]):
-        super().__init__(session.widget, state)
+    def __init__(
+        self,
+        session: VteTerminalSession,
+        state: dict[str, Any],
+        *,
+        widget: Gtk.Widget | None = None,
+    ):
+        super().__init__(widget if widget is not None else session.widget, state)
         self.session = session
 
     def focus(self) -> None:
         self.session.focus()
 
-    
+    @property
     def alive(self) -> bool:
-        return self.session.alive
+        return bool(getattr(self.session, "alive", True))
 
     def close(self) -> None:
         self.session.close()
@@ -252,11 +265,101 @@ class CodexPaneProvider(BaseProvider):
             context.codex_command(account, prompt),
             environment=embedded_codex_environment(),
         )
-        session = context.terminal.create(
-            spec,
-            on_exit=lambda: context.state_changed({"exited": True}),
+        rail_state = CodexRailState(account, cwd)
+        try:
+            session = context.terminal.create(
+                spec,
+                on_exit=lambda: context.state_changed({"exited": True}),
+            )
+            return CodexSurface(session, state, rail_state)
+        except BaseException:
+            rail_state.close()
+            raise
+
+
+class CodexSurface(TerminalSurface):
+    """One embedded Codex VTE plus non-scrolling, pane-local launcher chrome."""
+
+    STATUS_POLL_MILLISECONDS = 1_000
+
+    def __init__(
+        self,
+        session: VteTerminalSession,
+        state: dict[str, Any],
+        rail_state: CodexRailState,
+    ) -> None:
+        self.rail_state = rail_state
+        self.status_rail = create_status_rail_widget(
+            rail_state.status, rail_state.theme
         )
-        return TerminalSurface(session, state)
+        content = Gtk.Box(
+            orientation=Gtk.Orientation.VERTICAL,
+            spacing=0,
+            hexpand=True,
+            vexpand=True,
+        )
+        content.append(self.status_rail)
+        content.append(session.widget)
+        super().__init__(session, state, widget=content)
+        self._closed = False
+        self._transcript_exporter = TranscriptExporter()
+        self._inherited_terminal_background = (
+            session.terminal.get_color_background_for_draw()
+        )
+        self._theme = rail_state.theme
+        apply_terminal_theme(
+            session.terminal,
+            self._theme,
+            self._inherited_terminal_background,
+        )
+        self._copy_transcript_button = self.status_rail.add_action(
+            "Copy Full Transcript",
+            self._copy_full_transcript,
+            tooltip="Ask this Codex session to copy its full transcript",
+        )
+        self.status_rail.set_actions_sensitive(session.alive)
+        self._poll_source = GLib.timeout_add(
+            self.STATUS_POLL_MILLISECONDS, self._poll_status
+        )
+
+    def _copy_full_transcript(self, button: Any) -> None:
+        result = self._transcript_exporter.copy_current(
+            TranscriptSession(
+                identifier=id(self.session),
+                write_input=self.session.feed_input,
+                active=self.session.alive and not self._closed,
+            )
+        )
+        button.set_tooltip_text(result.message)
+
+    def _poll_status(self) -> bool:
+        if self._closed or not self.session.alive:
+            self._poll_source = 0
+            self.status_rail.set_actions_sensitive(False)
+            return GLib.SOURCE_REMOVE
+        status, theme = self.rail_state.refresh()
+        theme_changed = theme != self._theme
+        self._theme = theme
+        self.status_rail.update(status=status, theme=theme)
+        if theme_changed:
+            apply_terminal_theme(
+                self.session.terminal,
+                theme,
+                self._inherited_terminal_background,
+            )
+        return GLib.SOURCE_CONTINUE
+
+    def close(self) -> None:
+        if self._closed:
+            return
+        self._closed = True
+        if self._poll_source:
+            GLib.source_remove(self._poll_source)
+            self._poll_source = 0
+        self.status_rail.set_actions_sensitive(False)
+        self.status_rail.disconnect_updates()
+        self.rail_state.close()
+        super().close()
 
 
 class BrowserSurface(BaseSurface):

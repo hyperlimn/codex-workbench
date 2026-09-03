@@ -8,16 +8,17 @@ The bundle intentionally contains:
 - `codex-start`, the executable wrapper;
 - `codex_start.py`, the sanitized launcher core; and
 - `codex_terminal_theme.py`, the toolkit-neutral theme/status model imported by
-  the core.
+  the core; and
+- `codex_terminal_rail.py`, the reusable GTK rail and terminal-color adapter
+  used by Workbench around its existing VTE.
 
-The standalone launcher's optional GTK/VTE host, PTY bridge, and browser theme
-editor are not runtime requirements for Workbench's embedded terminal path.
+The standalone launcher's application window, VTE construction, PTY bridge,
+and browser theme editor are not runtime requirements for Workbench's embedded
+terminal path and are not bundled.
 Workbench sets `CODEX_START_HOSTED=1` for its VTE child so both a PATH launcher
 and this fallback use that existing terminal instead of opening a nested host.
 When `codex_terminal_ui.py` is absent outside Workbench, the launcher core also
-falls back to the current terminal. Do not partially copy those optional
-layers: a future shared status-rail integration should bring over the host,
-bridge, UI, and their focused tests as one reviewed change.
+falls back to the current terminal.
 
 `codex_start.py` is kept byte-for-byte aligned with the sanitized public
 launcher source. The public bundle contains no account definitions or account

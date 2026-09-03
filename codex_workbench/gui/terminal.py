@@ -58,10 +58,17 @@ class VteTerminalSession:
         if self.closed:
             return
         payload = f"{command.rstrip()}\n"
+        self.feed_input(payload.encode("utf-8"))
+
+    def feed_input(self, payload: bytes) -> None:
+        """Write bytes to this session without exposing terminal contents."""
+
+        if self.closed or not payload:
+            return
         try:
-            self.terminal.feed_child(payload.encode("utf-8"))
+            self.terminal.feed_child(payload)
         except TypeError:
-            self.terminal.feed_child(list(payload.encode("utf-8")))
+            self.terminal.feed_child(list(payload))
 
     def _child_exited(self, *_args: object) -> None:
         self.exited = True

@@ -1,0 +1,13 @@
+[Desktop Entry]
+Type=Application
+Version=1.0
+Name=Codex Workbench
+GenericName=AI Development Switchboard
+Comment=Switch projects, Codex accounts, Git identities, sessions, and handoffs
+Exec=codex-workbench
+Icon=codex-workbench
+Terminal=false
+Categories=Development;
+Keywords=Codex;Git;GitHub;Terminal;Developer;
+StartupNotify=true
+StartupWMClass=io.github.codex_workbench.Workbench

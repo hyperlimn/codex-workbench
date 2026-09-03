@@ -1,0 +1,20 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "codex-workbench"
+version = "0.5.0"
+description = "Native Linux development cockpit for multi-account Codex, Git, project roots, shells, and work sessions."
+requires-python = ">=3.11"
+dependencies = []
+
+[project.scripts]
+cwb = "codex_workbench.cli:main"
+codex-workbench = "codex_workbench.gui.app:main"
+
+[tool.setuptools.packages.find]
+include = ["codex_workbench*"]
+
+[tool.setuptools.package-data]
+"codex_workbench.gui.resources" = ["*.css", "*.svg", "*.in"]

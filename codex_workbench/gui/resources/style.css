@@ -1,0 +1,450 @@
+/* Codex Workbench v0.5.0 — compact development cockpit */
+window.workbench {
+  background: #0d1014;
+  color: #d9dde4;
+}
+
+headerbar.workbench-header {
+  min-height: 42px;
+  background: #11151b;
+  border-bottom: 1px solid #252b34;
+  box-shadow: none;
+}
+
+.wordmark {
+  color: #edf1f7;
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 1.6px;
+}
+
+.version-mark,
+.muted,
+.section-subtitle {
+  color: #77808d;
+  font-size: 11px;
+}
+
+.account-strip {
+  background: #0f1318;
+  border-bottom: 1px solid #222831;
+  padding: 7px 10px;
+}
+
+.account-strip-label,
+.eyebrow,
+.section-title,
+.confidence-label {
+  color: #7f8997;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 1.1px;
+}
+
+.account-chip {
+  min-width: 138px;
+  min-height: 42px;
+  padding: 0;
+  border: 1px solid #29303a;
+  border-radius: 7px;
+  background: #151a21;
+  box-shadow: none;
+}
+
+.account-chip:hover {
+  background: #1a2029;
+  border-color: #3a4350;
+}
+
+.account-chip:checked {
+  background: #19212b;
+  border-color: #5d8fc9;
+  box-shadow: inset 2px 0 #67a6e8;
+}
+
+.account-chip.usage-low {
+  border-color: #715f39;
+}
+
+.account-chip.usage-critical,
+.account-chip.usage-exhausted {
+  border-color: #8a4949;
+}
+
+.account-chip.usage-unavailable {
+  opacity: 0.68;
+}
+
+.account-name {
+  color: #e2e6ec;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.account-usage {
+  color: #8e98a6;
+  font-family: monospace;
+  font-size: 10px;
+}
+
+.sidebar {
+  min-width: 238px;
+  background: #101419;
+  border-right: 1px solid #242a32;
+}
+
+.sidebar-toolbar {
+  padding: 12px 11px 7px;
+}
+
+.project-list {
+  background: transparent;
+}
+
+.project-row {
+  margin: 1px 7px;
+  border-radius: 6px;
+  color: #cbd1d9;
+}
+
+.project-row:hover {
+  background: #171c23;
+}
+
+.project-row:selected {
+  background: #1d2631;
+  box-shadow: inset 2px 0 #68a7e8;
+}
+
+.project-title {
+  color: #dfe3e9;
+  font-weight: 650;
+  font-size: 12px;
+}
+
+.project-meta {
+  color: #76818f;
+  font-family: monospace;
+  font-size: 10px;
+}
+
+.project-dot {
+  color: #586170;
+  font-size: 8px;
+}
+
+.project-row.is-modified .project-dot {
+  color: #d2a44f;
+}
+
+.project-row.has-warning .project-dot {
+  color: #d46a6a;
+}
+
+.session-badge {
+  color: #8da7c6;
+  background: #202a35;
+  border-radius: 4px;
+  padding: 2px 5px;
+  font-size: 9px;
+}
+
+.sidebar-nav {
+  padding: 8px;
+  border-top: 1px solid #242a32;
+}
+
+.sidebar-nav button {
+  min-height: 34px;
+  border-radius: 5px;
+  color: #929ba8;
+}
+
+.workspace-scroll {
+  background: #0d1014;
+}
+
+.workspace {
+  padding: 18px 22px 24px;
+}
+
+.project-name {
+  color: #f0f3f8;
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: 0.3px;
+}
+
+.project-path,
+.monospace,
+.confidence-value,
+.git-file-path,
+.detail-value {
+  font-family: monospace;
+}
+
+.project-path {
+  color: #778392;
+  font-size: 11px;
+}
+
+.session-chip {
+  color: #9cbce1;
+  background: #172433;
+  border: 1px solid #29415c;
+  border-radius: 6px;
+  padding: 5px 9px;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.confidence-grid {
+  margin-top: 12px;
+  margin-bottom: 10px;
+  background: #11161c;
+  border-top: 1px solid #252c35;
+  border-bottom: 1px solid #252c35;
+}
+
+.confidence-cell {
+  min-width: 158px;
+  border-right: 1px solid #242b34;
+}
+
+.confidence-icon {
+  color: #667180;
+  font-weight: 800;
+}
+
+.tone-warning .confidence-icon {
+  color: #d0a452;
+}
+
+.tone-error .confidence-icon {
+  color: #e06c6c;
+}
+
+.confidence-value {
+  color: #d3d8df;
+  font-size: 11px;
+}
+
+.confidence-detail {
+  color: #717c89;
+  font-size: 9px;
+}
+
+.action-bar {
+  margin: 7px 0 14px;
+}
+
+.action-button {
+  min-height: 34px;
+  border-radius: 5px;
+  border: 1px solid #29313b;
+  background: #151a21;
+  box-shadow: none;
+  padding: 0 10px;
+}
+
+.action-button:hover {
+  background: #1d242d;
+  border-color: #3a4552;
+}
+
+.action-button.suggested-action {
+  background: #1b3046;
+  border-color: #31577c;
+  color: #dcecff;
+}
+
+.action-label {
+  font-size: 11px;
+  font-weight: 750;
+  letter-spacing: 0.3px;
+}
+
+.usage-warning {
+  background: #241f16;
+  border: 1px solid #554829;
+  border-radius: 6px;
+  padding: 10px 12px;
+  margin: 3px 0 12px;
+}
+
+.usage-warning.critical {
+  background: #281919;
+  border-color: #663737;
+}
+
+.warning-title {
+  color: #edcf8f;
+  font-weight: 750;
+}
+
+.critical .warning-title {
+  color: #ef9a9a;
+}
+
+.panel {
+  background: #11161c;
+  border: 1px solid #252c35;
+  border-radius: 7px;
+  padding: 14px;
+}
+
+.section-heading {
+  margin-bottom: 8px;
+}
+
+.objective-text {
+  color: #e0e4ea;
+  font-size: 16px;
+  font-weight: 650;
+  margin-bottom: 12px;
+}
+
+.memory-label {
+  color: #737f8d;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.9px;
+  margin-top: 8px;
+}
+
+.memory-value {
+  color: #c4cad3;
+  font-size: 12px;
+}
+
+.next-value {
+  color: #9ec4ef;
+}
+
+.git-file-row,
+.path-row,
+.thread-row,
+.activity-row,
+.dialog-row {
+  padding: 7px 4px;
+  border-bottom: 1px solid #20262e;
+}
+
+.git-file-kind {
+  min-width: 68px;
+  color: #8d98a5;
+  font-size: 9px;
+  font-weight: 800;
+}
+
+.git-file-path {
+  color: #c8ced6;
+  font-size: 10px;
+}
+
+.thread-label {
+  color: #d1d6dd;
+  font-weight: 650;
+}
+
+.thread-url {
+  color: #7187a1;
+  font-family: monospace;
+  font-size: 9px;
+}
+
+.activity-time {
+  min-width: 42px;
+  color: #66717e;
+  font-family: monospace;
+  font-size: 9px;
+}
+
+.terminal-dock {
+  background: #090c10;
+  border-top: 1px solid #303844;
+  min-height: 180px;
+}
+
+.terminal-dock-header {
+  min-height: 32px;
+  padding: 3px 8px;
+  background: #121820;
+  border-bottom: 1px solid #252d37;
+}
+
+.activity-summary {
+  color: #aeb6c0;
+  font-size: 10px;
+}
+
+.empty-title {
+  color: #e6eaf0;
+  font-size: 25px;
+  font-weight: 800;
+  letter-spacing: 1px;
+}
+
+.empty-subtitle {
+  color: #7c8794;
+  font-size: 13px;
+}
+
+dialog,
+window.dialog-window {
+  background: #101419;
+}
+
+.dialog-content {
+  padding: 18px;
+}
+
+.dialog-title {
+  color: #eef1f6;
+  font-size: 18px;
+  font-weight: 800;
+}
+
+.dialog-banner {
+  background: #22191a;
+  border: 1px solid #653a3d;
+  border-radius: 6px;
+  color: #ec9b9f;
+  padding: 9px;
+}
+
+.diff-view,
+.context-view {
+  background: #090c10;
+  color: #c8d0da;
+  border: 1px solid #262e38;
+  border-radius: 5px;
+  font-family: monospace;
+  font-size: 10px;
+  padding: 8px;
+}
+
+palette {
+  background: #11161d;
+  border: 1px solid #303946;
+  border-radius: 9px;
+}
+
+.command-row {
+  padding: 8px 10px;
+}
+
+.command-title {
+  color: #dce1e7;
+  font-weight: 650;
+}
+
+.command-shortcut {
+  color: #697583;
+  font-family: monospace;
+  font-size: 9px;
+}
+
+separator {
+  background: #252b33;
+}

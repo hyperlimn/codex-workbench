@@ -1,0 +1,60 @@
+{
+  "version": 4,
+  "projects": [
+    {
+      "id": "project-alpha",
+      "name": "project-alpha",
+      "directory": "/home/example/projects/project-alpha",
+      "codex_account": "account-one",
+      "git": {
+        "name": "Example Developer",
+        "email": "developer@example.invalid"
+      },
+      "github": {
+        "account": "example-org",
+        "host": "github.example",
+        "owner": "example-org"
+      },
+      "repository": {
+        "remote": "origin",
+        "expected_url": "https://github.example/example-org/project-alpha.git",
+        "remotes": {
+          "origin": "https://github.example/example-org/project-alpha.git"
+        }
+      },
+      "gpt_threads": [
+        "https://chatgpt.com/c/example-thread"
+      ],
+      "chatgpt_threads": [
+        {
+          "url": "https://chatgpt.com/c/example-discussion",
+          "label": "Feature discussion",
+          "notes": "Design and implementation notes"
+        }
+      ],
+      "instructions": [
+        "Keep architecture modular.",
+        "Inspect tests and Git state before changing files."
+      ],
+      "objective": "Build project alpha",
+      "terminal": {
+        "adapter": "tilix",
+        "layout": "workbench",
+        "mode": "embedded"
+      },
+      "theme": {
+        "color": "cobalt",
+        "label": "Project Alpha"
+      },
+      "associated_paths": [],
+      "workspace": {
+        "info_collapsed": false,
+        "prompt_hold": "",
+        "commands": [],
+        "panes": [],
+        "layout": null,
+        "focused_pane_id": ""
+      }
+    }
+  ]
+}

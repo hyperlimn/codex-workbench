@@ -1,0 +1,13 @@
+[Desktop Entry]
+Type=Application
+Version=1.0
+Name=Codex Workbench
+GenericName=AI Development Cockpit
+Comment=Clone and switch projects, roots, shells, Codex accounts, sessions, and handoffs
+Exec=@EXEC@
+Icon=codex-workbench
+Terminal=false
+Categories=Development;
+Keywords=Codex;Git;GitHub;Terminal;Developer;
+StartupNotify=true
+StartupWMClass=io.github.codex_workbench.Workbench

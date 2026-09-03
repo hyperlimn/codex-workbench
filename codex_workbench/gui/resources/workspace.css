@@ -22,7 +22,12 @@
 }
 
 .project-panel-grid {
-  margin-bottom: 15px;
+  margin-bottom: 12px;
+}
+
+.project-panel-grid .panel {
+  padding: 10px;
+  border-radius: 6px;
 }
 
 .compact-action {
@@ -147,6 +152,49 @@
   min-width: 5px;
   min-height: 5px;
   background: #1f2730;
+}
+
+.prompt-hold-utility {
+  min-height: 25px;
+}
+
+.prompt-hold-empty {
+  min-height: 25px;
+  padding: 0 8px;
+  border: 1px solid #2b3540;
+  border-radius: 4px;
+  background: #121820;
+  color: #8f9cab;
+  box-shadow: none;
+  font-size: 10px;
+}
+
+.prompt-hold-empty:hover {
+  background: #18212a;
+  border-color: #3b4856;
+  color: #bdc8d4;
+}
+
+.prompt-hold-held {
+  min-height: 25px;
+  padding: 1px 2px 1px 7px;
+  border: 1px solid #31506c;
+  border-radius: 4px;
+  background: #14202b;
+}
+
+.prompt-hold-state {
+  margin-right: 2px;
+  color: #8fb9df;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+}
+
+.prompt-hold-held button {
+  min-height: 21px;
+  padding: 0 5px;
+  border-radius: 3px;
 }
 
 window.undocked-pane-window {

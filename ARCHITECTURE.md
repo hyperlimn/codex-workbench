@@ -61,8 +61,8 @@ Project Registry ─ Project Workspace ─ Work Session Store ─ Settings / Act
 - `gui/clipboard.py`: main-thread one-shot GDK text reads and clipboard writes.
 - `gui/terminal.py`: optional VTE capability detection, PTY sessions, scrolling,
   right-click paste, focus, liveness, and visible command feed.
-- `gui/panels.py` / `gui/project_panels.py`: responsive Project Info grid,
-  collapse rail, Prompt Hold, Commands, and related actions.
+- `gui/panels.py` / `gui/project_panels.py`: responsive Project Info packing,
+  collapse rail, compact Prompt Hold utility, Commands, and related actions.
 - `gui/dock.py`: split-tree renderer, persistent per-project runtime ownership,
   pane controls, dock/undock windows, Focus mode, and command-to-terminal routing.
 - `gui/workspace.py`: provider contracts and Codex, Terminal, Browser, and Files
@@ -132,11 +132,16 @@ or discard panes.
 
 ## Project Information grid
 
-Project Info uses a breakpoint-based `Gtk.Grid`; panels are packed into one,
-two, or three columns with declared spans. The large layout deliberately forms
-complete rows, and the medium layout gives Objective and Instructions full-row
-spans. No panel uses arbitrary x/y coordinates. A per-project persisted flag
-switches the grid to a thin state-derived summary rail.
+Project Info uses an allocation-aware `Gtk.Grid`; panels declare stable minimum
+width, preferred span, growth, and priority metadata. The deterministic planner
+derives one, two, or three columns from available width and those minimums,
+then expands eligible cards to complete each row. No panel uses arbitrary x/y
+coordinates. A per-project persisted flag switches the whole grid to a thin
+state-derived summary rail.
+
+Prompt Hold sits beside Edit Project rather than in the information grid. Its
+one-shot GDK text capture, Copy, and Clear actions use the existing project
+workspace field and never display the full prompt in the upper chrome.
 
 The whole Project page is vertically scrollable. Provider surfaces keep their
 own native scroll owners: VTE handles terminal scrollback/mouse mode, WebKit

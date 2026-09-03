@@ -51,7 +51,7 @@ class GdkClipboardService:
             except Exception as error:
                 callback(None, str(error))
             else:
-                callback(None if value is None else str(value), "")
+                callback(value if isinstance(value, str) else None, "")
 
         try:
             clipboard.read_text_async(None, completed)

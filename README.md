@@ -127,11 +127,11 @@ handoff.
 
 ```text
 ┌ Codex accounts · 5h/week usage · reset details ─────────────────────┐
-├ Projects / Sessions / Settings ┬ Project · path · current session    │
+├ Projects / Sessions / Settings ┬ Project · Edit · Prompt Hold        │
 │ project-alpha                  │ Context confidence · actions         │
 │ project-beta                   │ ▾ PROJECT INFO                       │
 │ sample-repo                    │ responsive objective/tree/roots/     │
-│                                │ commands/prompt/threads/activity      │
+│                                │ commands/threads/activity/instructions│
 │                                ├ WORKSPACE · + PANE ─────────────────┤
 │                                │ Codex │ Terminal                     │
 │                                │───────┼ Browser / Files              │

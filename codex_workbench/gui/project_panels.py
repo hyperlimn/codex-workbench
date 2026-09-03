@@ -8,9 +8,21 @@ import gi
 gi.require_version("Gtk", "4.0")
 from gi.repository import Gtk  # noqa: E402
 
-from .panels import ResponsivePanelGrid
+from .panels import PanelPlacement, ResponsivePanelGrid
 from .widgets import SectionHeader, clear, icon_button, make_label
 from .workspace_dialogs import CommandSuggestionsDialog, ProjectCommandDialog
+
+PROJECT_INFO_CARDS = (
+    PanelPlacement("objective", min_width=400, preferred_span=2, priority=40),
+    PanelPlacement("working_tree", min_width=240, priority=50),
+    PanelPlacement("project_roots", min_width=260, priority=30),
+    PanelPlacement(
+        "project_commands", min_width=400, preferred_span=2, priority=20
+    ),
+    PanelPlacement("chatgpt_threads", min_width=240, priority=50),
+    PanelPlacement("recent_activity", min_width=220, priority=50),
+    PanelPlacement("project_instructions", min_width=220, priority=10),
+)
 
 
 class ProjectPanelsMixin:
@@ -21,6 +33,7 @@ class ProjectPanelsMixin:
         self.info_toggle = Gtk.Button()
         self.info_toggle.add_css_class("project-info-rail")
         self.info_toggle_label = make_label("▾ PROJECT INFO", "section-title")
+        self.info_toggle_label.set_ellipsize(3)
         self.info_toggle_label.set_hexpand(True)
         self.info_toggle.set_child(self.info_toggle_label)
         self.info_toggle.connect(
@@ -35,8 +48,52 @@ class ProjectPanelsMixin:
         section.append(self.info_revealer)
         return section
 
+    def _build_prompt_hold_utility(self) -> Gtk.Widget:
+        utility = Gtk.Box(
+            orientation=Gtk.Orientation.HORIZONTAL,
+            spacing=4,
+            valign=Gtk.Align.CENTER,
+        )
+        utility.add_css_class("prompt-hold-utility")
+        self.prompt_hold_button = Gtk.Button(label="Hold Prompt")
+        self.prompt_hold_button.add_css_class("prompt-hold-empty")
+        self.prompt_hold_button.set_tooltip_text(
+            "Hold clipboard text for this project"
+        )
+        self.prompt_hold_button.connect(
+            "clicked", lambda *_args: self.action_hold_clipboard()
+        )
+        utility.append(self.prompt_hold_button)
+
+        self.prompt_hold_state_box = Gtk.Box(
+            orientation=Gtk.Orientation.HORIZONTAL,
+            spacing=3,
+            valign=Gtk.Align.CENTER,
+        )
+        self.prompt_hold_state_box.add_css_class("prompt-hold-held")
+        self.prompt_hold_status_label = make_label("HELD", "prompt-hold-state")
+        self.prompt_hold_state_box.append(self.prompt_hold_status_label)
+        self.prompt_copy_button = Gtk.Button(label="Copy")
+        self.prompt_copy_button.set_tooltip_text("Copy held prompt")
+        self.prompt_clear_button = Gtk.Button(label="Clear")
+        self.prompt_clear_button.set_tooltip_text("Clear held prompt")
+        self.prompt_copy_button.connect(
+            "clicked", lambda *_args: self.action_copy_held_prompt()
+        )
+        self.prompt_clear_button.connect(
+            "clicked", lambda *_args: self.action_clear_held_prompt()
+        )
+        for button in (self.prompt_copy_button, self.prompt_clear_button):
+            button.add_css_class("compact-action")
+            self.prompt_hold_state_box.append(button)
+        utility.append(self.prompt_hold_state_box)
+        self._render_prompt_hold_utility("")
+        return utility
+
     def _build_project_panel_grid(self) -> Gtk.Widget:
         grid = ResponsivePanelGrid()
+        self.project_info_grid = grid
+        cards = {item.key: item for item in PROJECT_INFO_CARDS}
 
         memory = self._panel()
         header = SectionHeader("Current objective")
@@ -52,52 +109,7 @@ class ProjectPanelsMixin:
         self.current_state_label = self._memory_pair(memory, "CURRENT STATE")
         self.next_action_label = self._memory_pair(memory, "NEXT")
         self.next_action_label.add_css_class("next-value")
-        grid.append_panel(memory, large_span=2, medium_span=2)
-
-        prompt = self._panel()
-        prompt.append(SectionHeader("Prompt Hold"))
-        prompt_scroll = Gtk.ScrolledWindow(
-            hscrollbar_policy=Gtk.PolicyType.NEVER,
-            vscrollbar_policy=Gtk.PolicyType.AUTOMATIC,
-            max_content_height=150,
-            propagate_natural_height=True,
-        )
-        self.prompt_hold_label = make_label(
-            "Nothing held.", "memory-value", wrap=True, selectable=True
-        )
-        prompt_scroll.set_child(self.prompt_hold_label)
-        prompt.append(prompt_scroll)
-        prompt_actions = Gtk.Box(
-            orientation=Gtk.Orientation.HORIZONTAL,
-            spacing=5,
-            margin_top=5,
-        )
-        self.prompt_hold_button = Gtk.Button(label="Hold Clipboard")
-        self.prompt_copy_button = Gtk.Button(label="Copy")
-        self.prompt_send_button = Gtk.Button(label="Paste Into")
-        self.prompt_clear_button = Gtk.Button(label="Clear")
-        self.prompt_hold_button.connect(
-            "clicked", lambda *_args: self.action_hold_clipboard()
-        )
-        self.prompt_copy_button.connect(
-            "clicked", lambda *_args: self.action_copy_held_prompt()
-        )
-        self.prompt_send_button.connect(
-            "clicked", lambda *_args: self.action_send_held_prompt()
-        )
-        self.prompt_clear_button.connect(
-            "clicked", lambda *_args: self.action_clear_held_prompt()
-        )
-        for button in (
-            self.prompt_hold_button,
-            self.prompt_copy_button,
-            self.prompt_send_button,
-            self.prompt_clear_button,
-        ):
-            button.add_css_class("compact-action")
-            prompt_actions.append(button)
-        prompt.append(prompt_actions)
-        grid.append_panel(prompt)
+        grid.append_panel(memory, cards["objective"])
 
         git_panel = self._panel()
         git_panel.append(SectionHeader("Working tree"))
@@ -105,7 +117,7 @@ class ProjectPanelsMixin:
             orientation=Gtk.Orientation.VERTICAL, spacing=0
         )
         git_panel.append(self.git_file_list)
-        grid.append_panel(git_panel)
+        grid.append_panel(git_panel, cards["working_tree"])
 
         roots = self._panel()
         roots_header = SectionHeader("Project roots")
@@ -117,7 +129,7 @@ class ProjectPanelsMixin:
         roots.append(roots_header)
         self.path_list = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=0)
         roots.append(self.path_list)
-        grid.append_panel(roots)
+        grid.append_panel(roots, cards["project_roots"])
 
         commands = self._panel()
         command_header = SectionHeader("Project commands")
@@ -134,7 +146,7 @@ class ProjectPanelsMixin:
             orientation=Gtk.Orientation.VERTICAL, spacing=0
         )
         commands.append(self.command_list)
-        grid.append_panel(commands)
+        grid.append_panel(commands, cards["project_commands"])
 
         threads = self._panel()
         thread_header = SectionHeader("ChatGPT threads")
@@ -146,7 +158,7 @@ class ProjectPanelsMixin:
             orientation=Gtk.Orientation.VERTICAL, spacing=0
         )
         threads.append(self.thread_list)
-        grid.append_panel(threads)
+        grid.append_panel(threads, cards["chatgpt_threads"])
 
         activity = self._panel()
         activity.append(SectionHeader("Recent activity"))
@@ -154,7 +166,7 @@ class ProjectPanelsMixin:
             orientation=Gtk.Orientation.VERTICAL, spacing=0
         )
         activity.append(self.activity_list)
-        grid.append_panel(activity)
+        grid.append_panel(activity, cards["recent_activity"])
 
         instructions = self._panel()
         instructions.append(SectionHeader("Project instructions"))
@@ -162,12 +174,12 @@ class ProjectPanelsMixin:
             "None recorded.", "memory-value", wrap=True, selectable=True
         )
         instructions.append(self.instructions_label)
-        grid.append_panel(instructions, large_span=1, medium_span=2)
+        grid.append_panel(instructions, cards["project_instructions"])
         return grid
 
     def _render_project_panels(self, workspace: Any) -> None:
         self._render_info_toggle(workspace)
-        self._render_prompt_hold(workspace.project.workspace.prompt_hold)
+        self._render_prompt_hold_utility(workspace.project.workspace.prompt_hold)
         self._render_project_commands(workspace)
 
     def _render_info_toggle(self, workspace: Any) -> None:
@@ -179,12 +191,14 @@ class ProjectPanelsMixin:
             return
         tree_count = len(workspace.status.git.file_changes)
         command_count = len(project_workspace.commands)
-        prompt = "Prompt held" if project_workspace.prompt_hold else "Prompt empty"
         roots = 1 + len(workspace.project.associated_paths)
         objective = "Objective" if workspace.objective else "No objective"
+        instructions = len(workspace.project.instructions)
         self.info_toggle_label.set_text(
             f"▸ PROJECT INFO · {objective} · Tree {tree_count} · "
-            f"Commands {command_count} · {prompt} · Roots {roots}"
+            f"Roots {roots} · Commands {command_count} · "
+            f"Threads {len(workspace.threads)} · "
+            f"Activity {len(workspace.activity)} · Instructions {instructions}"
         )
 
     def _toggle_project_info(self) -> None:
@@ -197,31 +211,38 @@ class ProjectPanelsMixin:
         self.workspace.project.workspace.info_collapsed = collapsed
         self._render_info_toggle(self.workspace)
 
-    def _render_prompt_hold(self, text: str) -> None:
-        self.prompt_hold_label.set_text(text or "Nothing held.")
+    def _render_prompt_hold_utility(self, text: str) -> None:
         held = bool(text)
         self.prompt_hold_button.set_visible(not held)
-        self.prompt_copy_button.set_visible(held)
-        self.prompt_send_button.set_visible(held)
-        self.prompt_clear_button.set_visible(held)
+        self.prompt_hold_state_box.set_visible(held)
+        if held:
+            suffix = "char" if len(text) == 1 else "chars"
+            self.prompt_hold_status_label.set_text(
+                f"HELD · {len(text):,} {suffix}"
+            )
 
     def action_hold_clipboard(self) -> None:
         if not self.workspace:
             return
+        project_id = self.workspace.project.registry_id
 
         def completed(text: str | None, error: str) -> None:
             if error:
                 self.toast(f"Clipboard unavailable: {error}")
                 return
-            if text is None or not text:
+            if not isinstance(text, str):
+                self.toast("The clipboard does not contain text.")
+                return
+            if not text:
                 self.toast("The text clipboard is empty.")
                 return
-            self.controller.hold_prompt(
-                self.workspace.project.registry_id, text
-            )
-            self.workspace.project.workspace.prompt_hold = text
-            self._render_prompt_hold(text)
-            self._render_info_toggle(self.workspace)
+            self.controller.hold_prompt(project_id, text)
+            if (
+                self.workspace
+                and self.workspace.project.registry_id == project_id
+            ):
+                self.workspace.project.workspace.prompt_hold = text
+                self._render_prompt_hold_utility(text)
             self.toast("Held a clipboard snapshot for this project")
 
         self.native_clipboard.read_text(completed)
@@ -240,18 +261,15 @@ class ProjectPanelsMixin:
     def action_clear_held_prompt(self) -> None:
         if not self.workspace:
             return
-        self.controller.clear_prompt_hold(self.workspace.project.registry_id)
-        self.workspace.project.workspace.prompt_hold = ""
-        self._render_prompt_hold("")
-        self._render_info_toggle(self.workspace)
+        project_id = self.workspace.project.registry_id
+        self.controller.clear_prompt_hold(project_id)
+        if (
+            self.workspace
+            and self.workspace.project.registry_id == project_id
+        ):
+            self.workspace.project.workspace.prompt_hold = ""
+            self._render_prompt_hold_utility("")
         self.toast("Cleared held prompt")
-
-    def action_send_held_prompt(self) -> None:
-        if not self.workspace:
-            return
-        text = self.workspace.project.workspace.prompt_hold
-        if not self.workspace_dock.paste_into_active(text):
-            self.toast("Open or select a Codex/Terminal pane first.")
 
     def _render_project_commands(self, workspace: Any) -> None:
         clear(self.command_list)
@@ -432,6 +450,9 @@ class ProjectPanelsMixin:
         )
         self.workspace.project.workspace = project.workspace
         self._render_info_toggle(self.workspace)
+        self._render_prompt_hold_utility(
+            self.workspace.project.workspace.prompt_hold
+        )
 
     def _copy_text_and_toast(self, text: str) -> None:
         result = self._copy_text(text)

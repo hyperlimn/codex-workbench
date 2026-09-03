@@ -420,6 +420,7 @@ class SwitchboardWindow(ProjectPanelsMixin, Adw.ApplicationWindow):
             lambda *_args: self.action_edit_project(),
         )
         header.append(edit_project)
+        header.append(self._build_prompt_hold_utility())
         self.session_chip = make_label("", "session-chip")
         self.session_chip.set_valign(Gtk.Align.CENTER)
         header.append(self.session_chip)

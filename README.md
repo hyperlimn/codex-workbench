@@ -9,6 +9,10 @@ its context.** Workbench orchestrates the existing `codex-start` launcher; it
 does not replace or reimplement it. The service/CLI core remains Python
 standard-library only. The native interface uses GTK4 and libadwaita.
 
+## Workbench
+
+![Codex Workbench project workspace](docs/screenshots/workbench-overview.png)
+
 ## Implemented now
 
 - compact dark GTK4/libadwaita project workbench with asynchronous integration reads;
